@@ -23,4 +23,7 @@ class Itineraire extends Model
     public function user(){
         return $this->belongsTo(User::class,'userId');
     }
+    public function favoris(){
+        return $this->hasMany(favoris::class);
+    }
 }
