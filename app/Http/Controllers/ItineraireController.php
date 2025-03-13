@@ -9,28 +9,52 @@ use Illuminate\Support\Facades\Auth;
 class ItineraireController extends Controller
 {
 
-    // public function update(Request $request, $id)
-    // {
-    //     $itineraire = Itineraire::where('id', $id)
-    //     ->where('userId', Auth::id()) 
-    //     ->first();
-
-    //     if (!$itineraire) {
-    //         return response()->json(["ok" => false, "message" => "Itineraire not found"], 404);
-    //     }
-    //     if ($itineraire) {
-    //         $itineraire->update([
-    //             'titre' => $request->titre,
-    //             'categorie' => $request->categorie,
-    //             'duree' => $request->duree,
-    //             'image' => $request->image,
-    //             'destinations' => $request->destinations
-    //         ]);
-    //         return response()->json(['ok' => true, 'data' => $itineraire], 201);
-    //     } else {
-    //         return response()->json(["ok" => false], 500);
-    //     }
-    // }
+    public function update(Request $request, $id)
+    {
+        // Find the itinerary belonging to the authenticated user
+        $itineraire = Itineraire::where('id', $id)
+            ->where('userId', Auth::id())
+            ->first();
+    
+        if (!$itineraire) {
+            return response()->json(["ok" => false, "message" => "Itineraire not found"], 404);
+        }
+    
+        // Validate request data
+        $validated = $request->validate([
+            'titre' => 'required|string|max:255',
+            'categorie' => 'required|string',
+            'duree' => 'required|integer|min:1',
+            'image' => 'nullable|string',
+            'destinations' => 'nullable|array|min:1',
+            'destinations.*.nom' => 'required|string|max:255',
+            'destinations.*.lounge' => 'nullable|string|max:255',
+            'destinations.*.places_to_visit' => 'nullable|array',
+        ]);
+    
+        // Update the main itinerary fields
+        $itineraire->update([
+            'titre' => $validated['titre'],
+            'categorie' => $validated['categorie'],
+            'duree' => $validated['duree'],
+            'image' => $validated['image'] ?? $itineraire->image,
+        ]);
+    
+        // Update destinations if provided
+        if (isset($validated['destinations'])) {
+            $itineraire->destinations()->delete(); // Remove old destinations
+            foreach ($validated['destinations'] as $destinationData) {
+                $itineraire->destinations()->create($destinationData);
+            }
+        }
+    
+        return response()->json([
+            'ok' => true,
+            'message' => 'Itineraire updated successfully',
+            'data' => $itineraire->load('destinations')
+        ], 200);
+    }
+    
     public function addDestinations(Request $request, $id)
     {
         $itineraire = Itineraire::find($id);
