@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('nom');
             $table->string('lounge');
-            $table->json('destinations');
+            $table->json('places_to_visit');
+            $table->foreignId("itenairire_Id")->constrained('itineraires');
             $table->timestamps();
         });
     }

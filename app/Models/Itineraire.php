@@ -13,7 +13,6 @@ class Itineraire extends Model
         'categorie',
         'duree',
         'image',
-        'destinations',
         'userId'
     ];
     protected $casts = [
@@ -25,5 +24,8 @@ class Itineraire extends Model
     }
     public function favoris(){
         return $this->hasMany(favoris::class);
+    }
+    public function destinations(){
+        return $this->hasMany(Destination::class,"itenairire_Id");
     }
 }

@@ -15,9 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('titre');
             $table->string('categorie');
-            $table->date('duree');
+            $table->integer('duree');
             $table->string('image');
-            $table->foreignId('destinationId')->constrained('destinations');
             $table->foreignId('userId')->constrained('users');
             $table->timestamps();
         });
