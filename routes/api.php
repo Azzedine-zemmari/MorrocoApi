@@ -24,5 +24,7 @@ Route::group(['middleware'=>['auth:sanctum']], function(){
     Route::put('/destination/update/{id}', [ItineraireController::class, 'update']);
     Route::post('/favoris/add/{id}',[FavorisController::class,'addTofavoris']);
     Route::post('/destination/addDestinationDetails/{id}',[ItineraireController::class,'addDestinations']);
+    Route::get('/destination/search/{search}',[ItineraireController::class,'search']);
 });
+Route::get('/allDestination',[ItineraireController::class,'show']);
 Route::post("/register" , [AuthController::class , 'store']);

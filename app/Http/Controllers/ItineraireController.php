@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Itineraire;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use PDO;
 
 class ItineraireController extends Controller
 {
@@ -103,5 +105,25 @@ class ItineraireController extends Controller
             'message' => 'Success',
             'itinerary' => $itinerary
         ], 201);
+    }
+    public function show(){
+        $itineraire = DB::table('itineraires')->join('destinations','destinations.itenairire_Id','=','itineraires.id')->get();
+        return response()->json([
+            'message' => 'ok',
+            'itinerary' => $itineraire
+        ],200);
+    }
+    public function search($search){
+        $itineraire = Itineraire::where(function($query)use($search){
+            if(is_numeric($search)){
+                $query->where('duree',$search);
+            }else{
+                $query->where('categorie','LIKE','%search%');
+            }
+        })->get();
+        return response()->json([
+            'message' => 'ok',
+            'itinerary' => $itineraire
+        ],200);
     }
 }
