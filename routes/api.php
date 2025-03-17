@@ -27,6 +27,9 @@ Route::group(['middleware'=>['auth:sanctum']], function(){
     Route::post('/logout',[AuthController::class,'logout']);
 });
 Route::get('/destination/search/{search}',[ItineraireController::class,'search']);
+Route::get('/destination/rechercher/{search}',[ItineraireController::class,'recherche']);
+Route::get('/destination/static',[ItineraireController::class,'static']);
+Route::get('/destination/staticByCategorie',[ItineraireController::class,'IteneraireByCategorie']);
 Route::get('/allDestination',[ItineraireController::class,'show']);
 Route::post("/register" , [AuthController::class , 'store']);
 Route::post("/login" , [AuthController::class , 'login']);

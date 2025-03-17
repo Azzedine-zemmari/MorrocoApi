@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\favoris;
 use Illuminate\Http\Request;
 use App\Models\Itineraire;
 use Illuminate\Support\Facades\Auth;
@@ -113,17 +114,47 @@ class ItineraireController extends Controller
             'itinerary' => $itineraire
         ],200);
     }
+    // recherche avec duree ou bien categorie
     public function search($search){
         $itineraire = Itineraire::where(function($query)use($search){
             if(is_numeric($search)){
                 $query->where('duree',$search);
             }else{
-                $query->where('categorie','LIKE','%search%');
+                $query->where('categorie','LIKE','%'.$search.'%');
             }
         })->get();
         return response()->json([
             'message' => 'ok',
+
             'itinerary' => $itineraire
         ],200);
+    }
+    // recherche par mot cle 
+    public function recherche($search){
+        $itineraire = Itineraire::where('titre','LIKE','%'.$search.'%')->get();
+        return response()->json([
+            'message'=>'ok',
+            'itinerary' => $itineraire
+        ]);
+    }
+    // avoir le populaire iteniraire (erreur)
+    public function static(){
+        $itineraire = DB::table('itineraires')
+        ->join('favoris', 'favoris.itineraireId', '=', 'itineraires.id')
+        ->select('itineraires.id', DB::raw('COUNT(favoris.itineraireId) as total'))
+        ->groupBy('itineraires.id')
+        ->orderBy('total', 'desc')
+        ->first();
+
+        $response = [
+            'message' => 'ok',
+            'result' => $itineraire
+        ];
+
+        return response()->json($response);
+    }
+    public function IteneraireByCategorie(){
+        $itineraire = DB::table('itineraires')->select('categorie',DB::raw('COUNT(id) as total'))->groupBy('categorie')->get();
+        return response()->json(['message'=>'ok','result'=>$itineraire]);
     }
 }
